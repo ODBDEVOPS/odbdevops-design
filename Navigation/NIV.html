@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UI immersive · laboratoire cinématique</title>
+  <style>
+    /* ===== base & variables ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0b0e16;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .lab-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .lab-header h1 {
+      font-size: 2.5rem;
+      font-weight: 350;
+      background: linear-gradient(145deg, #f0eefb, #b8c2ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -0.02em;
+      text-shadow: 0 0 20px #3f4b9b66;
+    }
+    .lab-header p {
+      color: #7e8aa8;
+      font-weight: 300;
+      text-transform: uppercase;
+      letter-spacing: 0.4em;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+
+    .demo-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      max-width: 1300px;
+      width: 100%;
+    }
+
+    .demo-card {
+      flex: 1 1 320px;
+      max-width: 380px;
+      background: rgba(18, 24, 36, 0.7);
+      backdrop-filter: blur(6px);
+      border-radius: 2.5rem;
+      padding: 1.5rem 1rem 1.5rem 1rem;
+      box-shadow: 0 30px 40px -20px #000000, 0 0 0 1px #2e3b52 inset;
+      transition: transform 0.3s;
+    }
+    .demo-card:hover {
+      transform: translateY(-6px);
+    }
+    .card-title {
+      color: #cbd5f0;
+      font-weight: 400;
+      font-size: 1.2rem;
+      letter-spacing: 0.2em;
+      text-align: center;
+      margin-bottom: 1.2rem;
+      text-transform: uppercase;
+      border-bottom: 1px solid #2f3b50;
+      padding-bottom: 0.6rem;
+    }
+
+    /* simulateur d'écran (device) */
+    .device {
+      width: 100%;
+      height: 500px;
+      background: #101624;
+      border-radius: 32px;
+      overflow: hidden;
+      box-shadow: 0 20px 30px -10px black, 0 0 0 2px #2e3f58 inset;
+      position: relative;
+    }
+
+    /* ===== DÉMO 1 — CINÉMATIQUE (FULLSCREEN) ===== */
+    .cinematic-bg {
+      position: absolute;
+      top: -10%;
+      left: -10%;
+      width: 120%;
+      height: 120%;
+      background: #0a0c18;
+      z-index: 0;
+      animation: moveBg 18s infinite alternate ease-in-out;
+    }
+    .cinematic-bg::before {
+      content: '';
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle at 30% 30%, #a56eff, #3f1c6e 70%);
+      top: 20%;
+      left: 10%;
+      border-radius: 50%;
+      filter: blur(70px);
+      opacity: 0.5;
+      animation: glowPulse 8s infinite alternate;
+    }
+    .cinematic-bg::after {
+      content: '';
+      position: absolute;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle at 70% 80%, #5f9eff, #14346e 70%);
+      bottom: 0;
+      right: 0;
+      border-radius: 50%;
+      filter: blur(90px);
+      opacity: 0.5;
+      animation: glowPulse2 12s infinite alternate;
+    }
+    @keyframes moveBg {
+      0% { transform: scale(1) translate(0, 0); }
+      100% { transform: scale(1.05) translate(-2%, -2%); }
+    }
+    @keyframes glowPulse {
+      0% { opacity: 0.3; transform: scale(1); }
+      100% { opacity: 0.7; transform: scale(1.2); }
+    }
+    @keyframes glowPulse2 {
+      0% { opacity: 0.4; transform: scale(1) translate(0,0); }
+      100% { opacity: 0.8; transform: scale(1.3) translate(-5%, -5%); }
+    }
+
+    .cinematic-menu {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(5,7,12,0.2);
+      backdrop-filter: blur(3px);
+      color: white;
+      text-transform: uppercase;
+    }
+    .cinematic-menu h2 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      text-shadow: 0 0 30px cyan, 0 0 60px blue;
+      margin-bottom: 1rem;
+      transform: scaleY(1.1);
+      animation: titleFlicker 4s infinite;
+    }
+    .cinematic-links {
+      display: flex;
+      gap: 3rem;
+      font-size: 1.2rem;
+      font-weight: 400;
+      letter-spacing: 0.4em;
+    }
+    .cinematic-links span {
+      cursor: default;
+      padding: 0.8rem 1.2rem;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 60px;
+      backdrop-filter: blur(10px);
+      background: rgba(10,20,40,0.3);
+      transition: 0.3s;
+    }
+    .cinematic-links span:hover {
+      border-color: #a8cbff;
+      background: rgba(70,130,255,0.2);
+      box-shadow: 0 0 40px #4a7eff;
+      transform: scale(1.1);
+    }
+    @keyframes titleFlicker {
+      0% { text-shadow: 0 0 20px cyan, 0 0 40px blue; }
+      50% { text-shadow: 0 0 35px magenta, 0 0 70px #ff44ee; }
+      100% { text-shadow: 0 0 20px cyan, 0 0 40px blue; }
+    }
+
+    /* ===== DÉMO 2 — GRILLE CARD-BASED ===== */
+    .card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+      padding: 1rem;
+      height: 100%;
+      align-content: center;
+    }
+    .grid-item {
+      background: #182237;
+      border-radius: 28px;
+      padding: 1.2rem 0.5rem;
+      text-align: center;
+      backdrop-filter: blur(4px);
+      box-shadow: 0 8px 0 #0b101f, 0 0 0 2px #2e405b inset;
+      transition: all 0.2s ease;
+      cursor: default;
+      border: 1px solid rgba(255,255,255,0.03);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .grid-item:nth-child(1) { background: linear-gradient(145deg, #4a2b7a, #221c44); }
+    .grid-item:nth-child(2) { background: linear-gradient(145deg, #1f5f6e, #123138); }
+    .grid-item:nth-child(3) { background: linear-gradient(145deg, #7e2f5a, #331f33); }
+    .grid-item:nth-child(4) { background: linear-gradient(145deg, #31683e, #1e3723); }
+    .grid-item .card-icon {
+      font-size: 2.8rem;
+      line-height: 1;
+      filter: drop-shadow(0 0 8px currentColor);
+      color: rgba(255,255,240,0.9);
+    }
+    .grid-item span {
+      font-size: 1.2rem;
+      font-weight: 500;
+      letter-spacing: 0.2rem;
+      text-transform: uppercase;
+      color: white;
+      margin-top: 0.4rem;
+      text-shadow: 0 2px 5px black;
+    }
+    .grid-item:hover {
+      transform: scale(1.02) translateY(-6px);
+      box-shadow: 0 15px 0 #0b101f, 0 0 30px #bf9eff;
+      border-color: rgba(255,255,255,0.3);
+    }
+    /* micro interaction supplémentaire */
+    .grid-item:hover .card-icon {
+      animation: bounce 0.3s ease;
+    }
+    @keyframes bounce {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    /* ===== DÉMO 3 — BULLES / PARTICULES ===== */
+    .bubble-field {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #101624;
+    }
+
+    .bubble {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(90, 160, 255, 0.2);
+      backdrop-filter: blur(4px);
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 0 30px #5f9eff, inset 0 0 20px rgba(255,255,240,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      color: white;
+      text-transform: uppercase;
+      cursor: default;
+      transition: transform 0.1s ease-out, background 0.2s;
+      will-change: transform;
+      font-size: 1.4rem;
+      text-shadow: 0 2px 6px black;
+    }
+    .bubble:hover {
+      background: rgba(140, 200, 255, 0.6);
+      border-color: white;
+      box-shadow: 0 0 50px cyan;
+      z-index: 100;
+    }
+    /* tailles et positions définies en JS + style de base */
+  </style>
+</head>
+<body>
+  <div class="lab-header">
+    <h1>◈ NAVIGATION IMMERSIVE ◈</h1>
+    <p>cinématique · grille visuelle · particules</p>
+  </div>
+
+  <div class="demo-grid">
+    <!-- CARTE 1 : Cinématique (fullscreen animé) -->
+    <div class="demo-card">
+      <div class="card-title">◈ CINÉMATIQUE</div>
+      <div class="device">
+        <!-- fond animé abstrait (effet vidéo / lumière) -->
+        <div class="cinematic-bg"></div>
+        <div class="cinematic-menu">
+          <h2>STUDIO</h2>
+          <div class="cinematic-links">
+            <span>FILMS</span>
+            <span>SERIES</span>
+            <span>LAB</span>
+          </div>
+        </div>
+        <!-- petite signature -->
+        <div style="position: absolute; bottom: 12px; right: 20px; color: rgba(255,255,255,0.2); z-index: 10; font-size: 0.7rem;">◈ artistique ◈</div>
+      </div>
+      <div class="micro-note" style="color: #5b6b8c; text-align: center; margin-top: 0.5rem;">↺ fond cinétique / liens surimpression</div>
+    </div>
+
+    <!-- CARTE 2 : Grille card-based -->
+    <div class="demo-card">
+      <div class="card-title">◈ GRILLE VISUELLE</div>
+      <div class="device">
+        <div class="card-grid">
+          <div class="grid-item">
+            <div class="card-icon">◈</div>
+            <span>HOME</span>
+          </div>
+          <div class="grid-item">
+            <div class="card-icon">✦</div>
+            <span>WORK</span>
+          </div>
+          <div class="grid-item">
+            <div class="card-icon">⬩</div>
+            <span>ABOUT</span>
+          </div>
+          <div class="grid-item">
+            <div class="card-icon">◉</div>
+            <span>CONTACT</span>
+          </div>
+        </div>
+      </div>
+      <div class="micro-note" style="color: #5b6b8c; text-align: center; margin-top: 0.5rem;">↺ cartes néon · soulèvement au survol</div>
+    </div>
+
+    <!-- CARTE 3 : Bulles / particules réactives -->
+    <div class="demo-card">
+      <div class="card-title">◈ BULLES SENSIBLES</div>
+      <div class="device" id="bubbleDevice">
+        <div class="bubble-field" id="bubbleContainer"></div>
+      </div>
+      <div class="micro-note" style="color: #5b6b8c; text-align: center; margin-top: 0.5rem;">↺ les bulles fuient la souris · high‑tech</div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // ---------- DÉMO 3 : BULLES avec répulsion (effet particules) ----------
+      const container = document.getElementById('bubbleContainer');
+      if (container) {
+        const device = document.getElementById('bubbleDevice');
+        const bubbleCount = 14;
+        const bubbles = [];
+        const basePositions = []; // stocker les positions de base (en %)
+
+        // création des bulles avec styles aléatoires
+        for (let i = 0; i < bubbleCount; i++) {
+          const b = document.createElement('div');
+          b.className = 'bubble';
+          // taille aléatoire entre 50 et 100px
+          const size = 40 + Math.floor(Math.random() * 50);
+          b.style.width = size + 'px';
+          b.style.height = size + 'px';
+          // contenu texte (lettre ou symbole)
+          const symbols = ['◈', '◉', '⬩', '✦', '✧', '●', '○', '◌', '◍', '◎', '⦿', '⑅', '★'];
+          b.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+          // position de base en pourcentage (pour rester dans le conteneur)
+          const left = 10 + Math.random() * 70; // %
+          const top = 10 + Math.random() * 70;  // %
+          b.style.left = left + '%';
+          b.style.top = top + '%';
+          // facteur de profondeur pour le déplacement (entre 0.2 et 1.2)
+          const depth = 0.3 + Math.random() * 1.0;
+          b.dataset.depth = depth;
+          // couleur de fond un peu variable
+          const hue = 200 + Math.random() * 100;
+          b.style.background = `radial-gradient(circle at 30% 30%, rgba(${100 + Math.random()*100}, ${150 + Math.random()*100}, 255, 0.3), rgba(30, 40, 80, 0.5))`;
+          container.appendChild(b);
+          bubbles.push(b);
+          basePositions.push({ left, top, depth });
+        }
+
+        // gestion de la souris pour l'effet de répulsion
+        let rafId = null;
+        let mouseX = 0, mouseY = 0; // en pixels relatifs au container
+        let containerRect = container.getBoundingClientRect();
+
+        const updateMouseCoords = (e) => {
+          const rect = container.getBoundingClientRect();
+          mouseX = e.clientX - rect.left;
+          mouseY = e.clientY - rect.top;
+          // lancer l'animation
+          if (!rafId) {
+            rafId = requestAnimationFrame(updateBubbles);
+          }
+        };
+
+        const updateBubbles = () => {
+          const rect = container.getBoundingClientRect();
+          const w = rect.width;
+          const h = rect.height;
+          const centerX = w / 2;
+          const centerY = h / 2;
+
+          bubbles.forEach((bubble, idx) => {
+            const base = basePositions[idx];
+            // conversion position % -> px (de base)
+            const baseX = (base.left / 100) * w;
+            const baseY = (base.top / 100) * h;
+            const depth = base.depth;
+
+            // vecteur souris -> bulle (depuis la souris)
+            const dx = baseX - mouseX;
+            const dy = baseY - mouseY;
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            let offsetX = 0, offsetY = 0;
+
+            // si la souris est dans le container (ou assez proche) on applique un déplacement
+            if (dist < 150) {
+              const strength = (1 - dist / 150) * 18 * depth; // amplitude max 18px
+              const angle = Math.atan2(dy, dx);
+              // éloigner la bulle de la souris (répulsion)
+              offsetX = Math.cos(angle) * strength;
+              offsetY = Math.sin(angle) * strength;
+            }
+
+            // ajouter une petite perturbation flottante naturelle (très légère)
+            const floatX = Math.sin(Date.now() * 0.003 + idx) * 3;
+            const floatY = Math.cos(Date.now() * 0.002 + idx) * 3;
+
+            const finalX = baseX + offsetX + floatX;
+            const finalY = baseY + offsetY + floatY;
+
+            // garder dans les limites (optionnel)
+            // on applique en pourcentage pour éviter les sorties
+            const limitLeft = Math.max(0, Math.min(w - 40, finalX));
+            const limitTop = Math.max(0, Math.min(h - 40, finalY));
+
+            bubble.style.left = (limitLeft / w) * 100 + '%';
+            bubble.style.top = (limitTop / h) * 100 + '%';
+          });
+
+          rafId = null;
+        };
+
+        // écouter les mouvements de souris dans le device
+        device.addEventListener('mousemove', (e) => {
+          updateMouseCoords(e);
+        });
+
+        device.addEventListener('mouseleave', () => {
+          // remettre les bulles à leur position de base progressivement? on peut simplement annuler offset
+          // en réinitialisant avec une animation douce
+          const rect = container.getBoundingClientRect();
+          const w = rect.width;
+          const h = rect.height;
+          bubbles.forEach((bubble, idx) => {
+            const base = basePositions[idx];
+            bubble.style.left = base.left + '%';
+            bubble.style.top = base.top + '%';
+          });
+        });
+
+        // s'assurer que le container a une taille
+        window.addEventListener('resize', () => {
+          // les positions en % restent valides
+        });
+      }
+
+      // petites interactions supplémentaires pour la démo 2 (rien à faire)
+      // démo 1 déjà fonctionnelle
+    })();
+  </script>
+
+  <!-- note additionnelle design -->
+  <div style="color: #4b5675; margin-top: 3rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.3rem; border-top: 1px solid #283040; padding-top: 1.8rem; width: 100%; text-align: center;">
+    ✦ laboratoire UI · navigation immersive & visuelle ✦
+  </div>
+</body>
+</html>
