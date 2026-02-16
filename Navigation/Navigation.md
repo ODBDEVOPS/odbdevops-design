@@ -1,4 +1,8 @@
-Voici une liste des différents types de menus et de layouts de navigation adaptés à un site web professionnel à l'esthétique **futuriste**. L'accent est mis sur la transparence, les lignes épurées, les animations fluides et l'utilisation de l'espace négatif.
+**futuriste**
+```
+Rôle : Tu es un expert en développement front-end et en design d'interface (UI/UX). Ta mission est de créer un fichier HTML unique, complet et entièrement autonome qui sert de laboratoire de démonstration pour des composants UI innovants, en utilisant exclusivement du HTML et du CSS moderne.
+```
+
 ## Base
 ### 1. La Navigation Minimaliste et Aérée (Clean UX)
 C'est la base du design futuriste : moins c'est plus. Le menu disparaît pour laisser place au contenu, avec une technologie qui semble "invisible".
