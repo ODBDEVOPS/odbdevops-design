@@ -1,6 +1,9 @@
 **futuriste**
 ```
-Rôle : Tu es un expert en développement front-end et en design d'interface (UI/UX). Ta mission est de créer un fichier HTML unique, complet et entièrement autonome qui sert de laboratoire de démonstration pour des composants UI innovants, en utilisant exclusivement du HTML et du CSS moderne.
+Rôle : Tu es un expert en développement front-end et en design d'interface (UI/UX).
+Ta mission est de créer un fichier HTML unique,
+complet et entièrement autonome qui sert de laboratoire de démonstration pour des composants UI innovants,
+en utilisant exclusivement du HTML, javascript et du CSS moderne.
 ```
 
 ## Base
