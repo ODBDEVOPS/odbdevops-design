@@ -9,6 +9,7 @@ en utilisant exclusivement du HTML, javascript et du CSS moderne.
 ## Base
 ### 1. La Navigation Minimaliste et Aérée (Clean UX)
 [GitHub](https://github.com/ODBDEVOPS/onyzuka-guardians-of-time-v2)
+
 C'est la base du design futuriste : moins c'est plus. Le menu disparaît pour laisser place au contenu, avec une technologie qui semble "invisible".
 
 - **Menu hamburger futuriste :** L'icône (trois lignes) est souvent animée (elle se transforme en croix ou en une fine ligne). Au clic, le menu couvre tout l'écran avec une typographie massive et des animations de lettres fluides.
