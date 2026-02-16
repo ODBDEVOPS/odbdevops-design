@@ -1,1 +1,541 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UI navigation · laboratoire minimaliste</title>
+  <style>
+    /* ===== RESET & VARIABLES ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
+    body {
+      background: radial-gradient(circle at 20% 30%, #1b1e2a, #0b0d14);
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    /* titre du labo */
+    .lab-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .lab-header h1 {
+      font-size: 2.5rem;
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #f0f0fc, #b0b8d0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: 0 0 10px rgba(160, 180, 255, 0.3);
+    }
+    .lab-header p {
+      color: #8a91a8;
+      font-weight: 300;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4em;
+      margin-top: 0.5rem;
+    }
+
+    /* conteneur des trois cartes */
+    .demo-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      max-width: 1300px;
+      width: 100%;
+    }
+
+    /* carte demo */
+    .demo-card {
+      flex: 1 1 300px;
+      max-width: 360px;
+      background: rgba(20, 25, 35, 0.6);
+      backdrop-filter: blur(8px);
+      border-radius: 2.5rem;
+      padding: 1.5rem 1rem 1.8rem 1rem;
+      box-shadow: 0 30px 40px -20px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05) inset;
+      transition: transform 0.3s ease;
+    }
+    .demo-card:hover {
+      transform: translateY(-8px);
+    }
+    .card-title {
+      color: #ced6f0;
+      font-weight: 400;
+      font-size: 1.2rem;
+      letter-spacing: 0.2em;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 0.8rem;
+    }
+
+    /* simulateur d'écran (device) */
+    .device {
+      width: 100%;
+      height: 500px;
+      background: #141a24;
+      border-radius: 32px;
+      overflow: hidden;
+      box-shadow: 0 20px 30px -10px black, 0 0 0 2px #2e3a4c inset;
+      position: relative;
+    }
+
+    /* styles de contenu communs */
+    .content-placeholder {
+      padding: 1rem;
+      color: #b7c0d4;
+    }
+    .content-card {
+      background: rgba(255,255,255,0.04);
+      border-radius: 20px;
+      padding: 1.2rem;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(255,255,255,0.03);
+      backdrop-filter: blur(2px);
+    }
+    .content-card p {
+      font-size: 0.9rem;
+      line-height: 1.5;
+      color: #b0b9d0;
+    }
+    .placeholder-img {
+      width: 100%;
+      height: 100px;
+      background: linear-gradient(145deg, #2d3445, #1b212e);
+      border-radius: 16px;
+      margin: 1rem 0;
+      box-shadow: inset 0 2px 5px #00000033;
+    }
+
+    /* ===== DEMO 1 — FUTURISTIC HAMBURGER ===== */
+    #demo1 {
+      position: relative;
+    }
+    .hamburger-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      width: 42px;
+      height: 42px;
+      background: rgba(20, 30, 45, 0.6);
+      backdrop-filter: blur(8px);
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      z-index: 30;
+      border: 1px solid rgba(255,255,255,0.15);
+      transition: all 0.2s;
+    }
+    .hamburger-btn:hover {
+      background: rgba(50, 70, 100, 0.7);
+      border-color: rgba(255,255,255,0.4);
+    }
+    .hamburger-btn span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: white;
+      border-radius: 4px;
+      transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1), opacity 0.2s;
+      box-shadow: 0 0 6px #a0c0ff;
+    }
+    .hamburger-btn.active span:nth-child(1) {
+      transform: translateY(8px) rotate(45deg);
+    }
+    .hamburger-btn.active span:nth-child(2) {
+      opacity: 0;
+      transform: scale(0.2);
+    }
+    .hamburger-btn.active span:nth-child(3) {
+      transform: translateY(-8px) rotate(-45deg);
+    }
+
+    /* overlay menu plein écran (dans le device) */
+    .menu-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(5, 8, 15, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 25;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s;
+    }
+    .menu-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .menu-overlay ul {
+      list-style: none;
+      text-align: center;
+    }
+    .menu-overlay li {
+      font-size: 3.2rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: transparent;
+      -webkit-text-stroke: 2px rgba(255,255,255,0.5);
+      text-stroke: 2px rgba(255,255,255,0.5);
+      margin: 1rem 0;
+      animation: fadeUp 0.5s backwards;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .menu-overlay li:hover {
+      -webkit-text-stroke: 2px #aac0ff;
+      color: rgba(170, 192, 255, 0.2);
+      transform: scale(1.05);
+    }
+    .menu-overlay li:nth-child(1) { animation-delay: 0.1s; }
+    .menu-overlay li:nth-child(2) { animation-delay: 0.2s; }
+    .menu-overlay li:nth-child(3) { animation-delay: 0.3s; }
+    .menu-overlay li:nth-child(4) { animation-delay: 0.4s; }
+
+    @keyframes fadeUp {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== DEMO 2 — GLASSMORPHISM FLOATING ===== */
+    .glass-nav {
+      position: sticky;
+      top: 0;
+      z-index: 15;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem 1.5rem;
+      background: rgba(20, 30, 45, 0.2);
+      backdrop-filter: blur(16px) saturate(180%);
+      -webkit-backdrop-filter: blur(16px) saturate(180%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 20px rgba(120, 180, 255, 0.3);
+      border-radius: 0 0 20px 20px;
+      margin: 0 4px;
+      width: calc(100% - 8px);
+      left: 4px;
+    }
+    .glass-logo {
+      font-weight: 600;
+      color: white;
+      font-size: 1.2rem;
+      text-shadow: 0 0 15px cyan;
+    }
+    .glass-items {
+      display: flex;
+      gap: 1.2rem;
+    }
+    .glass-items span {
+      color: rgba(255,255,255,0.8);
+      font-size: 0.9rem;
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      transition: 0.2s;
+      cursor: default;
+    }
+    .glass-items span:hover {
+      color: white;
+      text-shadow: 0 0 12px #8cb4ff;
+    }
+
+    /* ===== DEMO 3 — RÉTRACTABLE ===== */
+    #demo3 {
+      position: relative;
+      background: #121520; /* fallback */
+    }
+    .retract-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 44px;
+      background: #1e2638;
+      border-bottom: 1px solid #3c4a60;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      color: white;
+      z-index: 20;
+      transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    }
+    .retract-bar.hidden {
+      transform: translateY(-100%);
+    }
+    .retract-bar.force-visible {
+      transform: translateY(0) !important;
+    }
+    .retract-logo {
+      font-weight: 600;
+      letter-spacing: 1px;
+      font-size: 1rem;
+      color: #d0dcff;
+    }
+    .retract-icons {
+      display: flex;
+      gap: 1.2rem;
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+    .scroll-content {
+      height: 100%;
+      overflow-y: auto;
+      padding-top: 44px; /* hauteur barre */
+      scroll-behavior: smooth;
+    }
+
+    /* petits détails */
+    .micro-note {
+      font-size: 0.7rem;
+      color: #5d6a82;
+      text-align: center;
+      margin-top: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="lab-header">
+    <h1>◈ NAVIGATION · INVISIBLE ◈</h1>
+    <p>hamburger futuriste · verre flottant · barre rétractable</p>
+  </div>
+
+  <div class="demo-grid">
+    <!-- CARTE 1 : Hamburger futuriste -->
+    <div class="demo-card">
+      <div class="card-title">◈ HAMBURGER XXL</div>
+      <div class="device" id="demo1">
+        <!-- bouton hamburger -->
+        <div class="hamburger-btn" id="hamburgerToggle">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <!-- overlay menu (plein écran dans le device) -->
+        <div class="menu-overlay" id="hamburgerOverlay">
+          <ul>
+            <li>HOME</li>
+            <li>WORK</li>
+            <li>ABOUT</li>
+            <li>CONTACT</li>
+          </ul>
+        </div>
+        <!-- contenu simulé derrière -->
+        <div style="padding: 80px 1rem 1rem 1rem; color: #ddd;">
+          <div class="content-card">
+            <p>✧ menu invisible — tapoter l'icône</p>
+          </div>
+          <div class="placeholder-img"></div>
+          <div class="content-card">
+            <p>typographie massive & animations fluides.</p>
+          </div>
+          <div class="placeholder-img" style="height: 70px;"></div>
+          <div class="content-card">
+            <p>L'icône se transforme en croix.</p>
+          </div>
+        </div>
+      </div>
+      <div class="micro-note">↺ clic sur l'icône · lettres animées</div>
+    </div>
+
+    <!-- CARTE 2 : Glassmorphism flottant -->
+    <div class="demo-card">
+      <div class="card-title">◈ VERRE FLOTTANT</div>
+      <div class="device" id="demo2">
+        <!-- navigation glass -->
+        <div class="glass-nav">
+          <span class="glass-logo">⟡ AURA</span>
+          <div class="glass-items">
+            <span>HOME</span>
+            <span>WORK</span>
+            <span>ABOUT</span>
+          </div>
+        </div>
+        <!-- contenu scrollable derrière -->
+        <div style="height: 100%; overflow-y: auto; padding: 1rem; color: #cfd7ec;">
+          <div class="content-card" style="background: rgba(0,10,25,0.3);">
+            <p>◈ barre translucide · flou · lueurs fines</p>
+          </div>
+          <div class="placeholder-img" style="background: linear-gradient(145deg, #3a4b67, #1d2a3a);"></div>
+          <div class="content-card">Le verre dépoli flotte au-dessus du contenu.</div>
+          <div class="placeholder-img" style="height: 120px;"></div>
+          <div class="content-card">Bords lumineux, immersion luxueuse.</div>
+          <div class="placeholder-img"></div>
+        </div>
+      </div>
+      <div class="micro-note">↺ backdrop‑filter · éclats subtils</div>
+    </div>
+
+    <!-- CARTE 3 : Barre fine rétractable -->
+    <div class="demo-card">
+      <div class="card-title">◈ RÉTRACTABLE</div>
+      <div class="device" id="demo3">
+        <!-- barre fine (position absolute) -->
+        <div class="retract-bar" id="retractBar">
+          <span class="retract-logo">⏺ MINIMAL</span>
+          <div class="retract-icons">
+            <span>⌂</span>
+            <span>◈</span>
+            <span>◉</span>
+          </div>
+        </div>
+        <!-- zone scrollable avec padding-top = hauteur barre -->
+        <div class="scroll-content" id="scrollContentDemo">
+          <div style="padding: 0.5rem 1rem 2rem 1rem;">
+            <div class="content-card">⬆️ scroll vers le bas → barre disparaît</div>
+            <div class="placeholder-img"></div>
+            <div class="content-card">⬆️ scroll vers le haut → réapparaît</div>
+            <div class="placeholder-img"></div>
+            <div class="content-card">🖱️ souris près du bord → force l'affichage</div>
+            <div class="placeholder-img" style="height: 150px;"></div>
+            <div class="content-card">Épure fonctionnelle, centrée utilisateur.</div>
+            <div class="placeholder-img"></div>
+            <div class="content-card">encore du contenu pour faire défiler...</div>
+            <div class="placeholder-img"></div>
+            <div class="content-card">presque fin · encore un peu</div>
+            <div class="placeholder-img"></div>
+          </div>
+        </div>
+      </div>
+      <div class="micro-note">↺ cache au scroll · souris top</div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // attente chargement DOM
+      document.addEventListener('DOMContentLoaded', function() {
+
+        // ---------- DEMO 1 : Hamburger futuriste ----------
+        const demo1 = document.getElementById('demo1');
+        const hamburgerBtn = demo1.querySelector('.hamburger-btn');
+        const overlay = demo1.querySelector('.menu-overlay');
+
+        if (hamburgerBtn && overlay) {
+          // toggle menu au clic sur le bouton
+          hamburgerBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const isActive = overlay.classList.contains('active');
+            overlay.classList.toggle('active', !isActive);
+            hamburgerBtn.classList.toggle('active', !isActive);
+          });
+
+          // fermer le menu quand on clique sur un lien (simulé)
+          overlay.querySelectorAll('li').forEach(link => {
+            link.addEventListener('click', function() {
+              overlay.classList.remove('active');
+              hamburgerBtn.classList.remove('active');
+            });
+          });
+        }
+
+        // ---------- DEMO 3 : Barre rétractable ----------
+        const demo3 = document.getElementById('demo3');
+        const retractBar = document.getElementById('retractBar');
+        const scrollContent = document.getElementById('scrollContentDemo');
+
+        if (demo3 && retractBar && scrollContent) {
+          let lastScrollTop = 0;
+          let ticking = false;
+          const SCROLL_UP_THRESHOLD = 5; // sensibilité
+
+          // fonction de mise à jour basée sur le scroll
+          function updateBarOnScroll() {
+            const scrollTop = scrollContent.scrollTop;
+            // différence de direction
+            if (scrollTop > lastScrollTop + 2 && scrollTop > 30) {
+              // scroll down → cacher (sauf si forceVisible)
+              if (!retractBar.classList.contains('force-visible')) {
+                retractBar.classList.add('hidden');
+              }
+            } else if (scrollTop < lastScrollTop - 2 || scrollTop <= 20) {
+              // scroll up ou tout en haut → montrer
+              retractBar.classList.remove('hidden');
+            }
+            lastScrollTop = scrollTop;
+            ticking = false;
+          }
+
+          // scroll listener avec requestAnimationFrame
+          scrollContent.addEventListener('scroll', function() {
+            if (!ticking) {
+              window.requestAnimationFrame(updateBarOnScroll);
+              ticking = true;
+            }
+          });
+
+          // gestion souris pour forcer l'affichage
+          function handleMouseMove(e) {
+            const rect = demo3.getBoundingClientRect();
+            const mouseY = e.clientY - rect.top; // position relative au device
+            // si souris dans les 70px du haut, on force visible
+            if (mouseY >= 0 && mouseY < 70) {
+              retractBar.classList.add('force-visible');
+              // on enlève hidden pour éviter conflit
+              retractBar.classList.remove('hidden');
+            } else {
+              retractBar.classList.remove('force-visible');
+              // réévalue l'état scroll après suppression force
+              // on rappelle update rapidement
+              if (!ticking) {
+                window.requestAnimationFrame(function() {
+                  updateBarOnScroll();
+                  // si on est en haut, hidden est déjà enlevé
+                });
+              }
+            }
+          }
+
+          demo3.addEventListener('mousemove', handleMouseMove);
+          demo3.addEventListener('mouseleave', function() {
+            retractBar.classList.remove('force-visible');
+            // re-synchro avec le scroll
+            if (!ticking) {
+              window.requestAnimationFrame(updateBarOnScroll);
+            }
+          });
+
+          // initialisation : s'assurer que la barre soit visible en haut
+          setTimeout(() => {
+            lastScrollTop = scrollContent.scrollTop;
+            retractBar.classList.remove('hidden', 'force-visible');
+          }, 50);
+        }
+
+        // ---------- PETITE TOUCHE : glassmorphism (pas de JS) ----------
+        // Rien à faire, tout est CSS.
+      });
+    })();
+  </script>
+
+  <!-- petit message supplémentaire (design) -->
+  <div style="color: #4e5770; margin-top: 3rem; font-size: 0.8rem; letter-spacing: 0.2rem; text-transform: uppercase; border-top: 1px solid #2a3142; padding-top: 1.5rem; width: 100%; text-align: center;">
+    ✦ navigation invisible · moins c'est plus ✦
+  </div>
+</body>
+</html>
